@@ -159,26 +159,7 @@ export function LoginView() {
               {loading ? <><Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> Signing in…</> : 'Sign In'}
             </Button>
           </form>
-
-          {/* Demo credentials */}
-          <div className="mt-8 p-4 rounded-2xl bg-white border border-[#E5E1D7]">
-            <div className="flex items-center gap-2 mb-3">
-              <ShieldCheck className="w-4 h-4 text-[#C5F82A]" />
-              <div className="text-xs uppercase tracking-wider font-semibold text-[#1A1A1A]">Staff Credentials</div>
-            </div>
-            <div className="space-y-2">
-              <button
-                onClick={() => fillDemo('utkarshmaurya917027@gmail.com', 'pass@123')}
-                className="block w-full text-left p-2.5 rounded-lg hover:bg-[#F4F1EA] transition-colors"
-              >
-                <div className="text-sm font-medium">Developer (full access)</div>
-                <div className="text-xs text-[#8A8478] font-mono">utkarshmaurya917027@gmail.com / pass@123</div>
-              </button>
-            </div>
-            <p className="text-[11px] text-[#8A8478] mt-3">
-              No public signup. Only whitelisted staff can log in.
-            </p>
-          </div>
+          
         </div>
       </div>
     </div>
