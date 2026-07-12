@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Search, Filter, RefreshCw, CheckCircle2, XCircle, Ban, Phone, Clock } from 'lucide-react'
+import { Search, Filter, RefreshCw, CheckCircle2, XCircle, Ban, Phone, Clock, Trash2 } from 'lucide-react'
 import { useState as useReactState } from 'react'
 import { toast } from 'sonner'
 import { authedFetch } from '@/lib/auth-client'
@@ -160,6 +160,24 @@ function BookingCard({ booking, onRefresh }: { booking: Booking; onRefresh: () =
     }
   }
 
+  const deleteBooking = async () => {
+    if (!confirm(`Permanently delete "${booking.customerName}"'s appointment? This cannot be undone.`)) return
+    setUpdating('delete')
+    try {
+      const r = await authedFetch(`/api/bookings/${booking.id}`, { method: 'DELETE' })
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}))
+        throw new Error(d.error || 'Delete failed')
+      }
+      toast.success('Appointment deleted.')
+      onRefresh()
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to delete')
+    } finally {
+      setUpdating(null)
+    }
+  }
+
   const statusStyles: Record<string, string> = {
     confirmed: 'bg-blue-100 text-blue-700 border-blue-200',
     done: 'bg-emerald-100 text-emerald-700 border-emerald-200',
@@ -216,7 +234,14 @@ function BookingCard({ booking, onRefresh }: { booking: Booking; onRefresh: () =
               </Button>
             </>
           )}
-          {(booking.status === 'confirmed' || booking.status === 'done') && (
+          {(booking.status === 'done' || booking.status === 'no-show' || booking.status === 'cancelled') && (
+            <Button size="sm" variant="ghost" disabled={!!updating} onClick={deleteBooking}
+              className="text-red-500 hover:bg-red-50 h-8 text-xs rounded-lg">
+              <Trash2 className="w-3.5 h-3.5 mr-1" />
+              {updating === 'delete' ? 'Deleting…' : 'Delete'}
+            </Button>
+          )}
+          {booking.status === 'confirmed' && (
             <Button size="sm" variant="ghost" disabled={!!updating} onClick={() => updateStatus('cancelled')}
               className="text-red-500 hover:bg-red-50 h-8 text-xs rounded-lg">
               <Ban className="w-3.5 h-3.5 mr-1" />
