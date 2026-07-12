@@ -1,0 +1,44 @@
+# dependencies
+node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# env files — NEVER commit secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# vercel
+.vercel
+
+# logs
+*.log
+dev.log
+server.log
+
+# sandbox-only artifacts (not part of the real project)
+/skills/
+/tool-results/
+/examples/
+/mini-services/
+/download/
+/db/
+/prisma-placeholder.db
+/worklog.md
+/upload/
+next-env.d.ts
+*.tsbuildinfo
+.claude
+.z-ai-config

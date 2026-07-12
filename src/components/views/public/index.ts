@@ -1,0 +1,6 @@
+export { HomeView } from './HomeView'
+export { ServicesView } from './ServicesView'
+export { BookingView } from './BookingView'
+export { GalleryView } from './GalleryView'
+export { AboutView } from './AboutView'
+export { ContactView } from './ContactView'

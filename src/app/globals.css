@@ -1,0 +1,228 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Mukesh Unisex Salon — Global Design System
+ * --------------------------------------------
+ * Palette:
+ *   App background  — cream / off-white   #F4F1EA
+ *   Sidebar         — near-black           #1A1A1A
+ *   Cards           — pure white           #FFFFFF
+ *   Accent          — acid lime            #C5F82A (used sparingly: CTAs, active, badges)
+ *   Primary text    — near-black           #1A1A1A
+ *   Muted text      — warm grey            #8A8478
+ *
+ * Typography:
+ *   Display/headings — Clash Display (geometric, bold, modern)
+ *   Body/labels      — General Sans (clean, highly readable)
+ *
+ * Cards: white, rounded-2xl, soft shadow (shadow-soft)
+ * Consistent spacing scale, consistent corner radius everywhere.
+ */
+
+@theme inline {
+  /* Fonts */
+  --font-display: 'Clash Display', 'Cabinet Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'General Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-body);
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Brand colors — exposed as Tailwind utilities */
+  --color-app-bg: #F4F1EA;
+  --color-app-fg: #1A1A1A;
+  --color-sidebar-bg: #1A1A1A;
+  --color-sidebar-fg: #F4F1EA;
+  --color-accent: #C5F82A;
+  --color-accent-fg: #1A1A1A;
+  --color-card: #FFFFFF;
+  --color-card-fg: #1A1A1A;
+  --color-muted-warm: #8A8478;
+  --color-border-warm: #E5E1D7;
+
+  /* shadcn-compatible aliases */
+  --color-background: #F4F1EA;
+  --color-foreground: #1A1A1A;
+  --color-card-background: #FFFFFF;
+  --color-card-foreground: #1A1A1A;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #1A1A1A;
+  --color-primary: #1A1A1A;
+  --color-primary-foreground: #F4F1EA;
+  --color-secondary: #EDE9DF;
+  --color-secondary-foreground: #1A1A1A;
+  --color-muted: #EDE9DF;
+  --color-muted-foreground: #8A8478;
+  --color-accent-foreground: #1A1A1A;
+  --color-destructive: #E5484D;
+  --color-border: #E5E1D7;
+  --color-input: #E5E1D7;
+  --color-ring: #C5F82A;
+
+  /* Chart palette — flat, distinct */
+  --color-chart-1: #C5F82A;   /* lime */
+  --color-chart-2: #1A1A1A;   /* near-black */
+  --color-chart-3: #D4A574;   /* warm tan */
+  --color-chart-4: #6B9080;   /* sage */
+  --color-chart-5: #B07BAC;   /* mauve */
+
+  /* Sidebar tokens (for shadcn sidebar component if used) */
+  --color-sidebar: #1A1A1A;
+  --color-sidebar-foreground: #F4F1EA;
+  --color-sidebar-primary: #C5F82A;
+  --color-sidebar-primary-foreground: #1A1A1A;
+  --color-sidebar-accent: #2A2A2A;
+  --color-sidebar-accent-foreground: #F4F1EA;
+  --color-sidebar-border: #2A2A2A;
+  --color-sidebar-ring: #C5F82A;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+
+  /* Legacy aliases (keep for shadcn components that reference them) */
+  --radius: 16px;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #1A1A1A;
+  --color-accent: #C5F82A;
+  --color-secondary-foreground: #1A1A1A;
+  --color-primary-foreground: #F4F1EA;
+}
+
+/* Base */
+@layer base {
+  * {
+    border-color: var(--color-border-warm);
+    outline-color: var(--color-accent);
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    background-color: #F4F1EA;
+    color: #1A1A1A;
+    font-family: var(--font-body);
+    font-feature-settings: "ss01", "cv11";
+  }
+  /* All headings use Clash Display */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  /* Custom scrollbar — thin, subtle */
+  .scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scroll-thin::-webkit-scrollbar-track { background: transparent; }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: rgba(138, 132, 120, 0.3);
+    border-radius: 9999px;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(138, 132, 120, 0.5);
+  }
+  /* Dark scrollbar (for dark sidebar) */
+  .scroll-dark::-webkit-scrollbar { width: 4px; height: 4px; }
+  .scroll-dark::-webkit-scrollbar-track { background: transparent; }
+  .scroll-dark::-webkit-scrollbar-thumb {
+    background: rgba(244, 241, 234, 0.15);
+    border-radius: 9999px;
+  }
+}
+
+/* =============================================
+ * DESIGN SYSTEM UTILITY CLASSES
+ * ============================================= */
+
+/* The soft card shadow used everywhere */
+@layer utilities {
+  .shadow-soft {
+    box-shadow: 0 1px 3px rgba(26, 26, 26, 0.04), 0 4px 12px rgba(26, 26, 26, 0.04);
+  }
+  .shadow-soft-lg {
+    box-shadow: 0 2px 8px rgba(26, 26, 26, 0.06), 0 8px 24px rgba(26, 26, 26, 0.06);
+  }
+  .shadow-sidebar {
+    box-shadow: 0 8px 32px rgba(26, 26, 26, 0.12);
+  }
+
+  /* Lime accent text */
+  .text-accent-lime {
+    color: #C5F82A;
+  }
+  .bg-accent-lime {
+    background-color: #C5F82A;
+  }
+
+  /* Display font helper */
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  /* Card primitive — white, rounded-2xl, soft shadow */
+  .card-base {
+    background: #FFFFFF;
+    border-radius: 24px;
+    box-shadow: 0 1px 3px rgba(26, 26, 26, 0.04), 0 4px 12px rgba(26, 26, 26, 0.04);
+    border: 1px solid rgba(229, 225, 215, 0.6);
+  }
+  .card-dark {
+    background: #1A1A1A;
+    border-radius: 24px;
+    color: #F4F1EA;
+  }
+}
+
+/* Dark mode override — the admin area uses dark sidebar but light main content.
+   We don't flip the whole app to dark; instead the sidebar is always dark. */
+.dark {
+  --color-background: #1A1A1A;
+  --color-foreground: #F4F1EA;
+}
+
+/* =============================================
+ * SONNER TOAST STYLING — matches the salon design system
+ * Dark surface, cream text, lime success accent, red error accent.
+ * ============================================= */
+[data-sonner-toaster] [data-sonner-toast] {
+  padding: 14px 18px !important;
+  box-shadow: 0 8px 32px rgba(26, 26, 26, 0.18), 0 2px 8px rgba(26, 26, 26, 0.12) !important;
+}
+[data-sonner-toaster] [data-sonner-toast] [data-title] {
+  font-weight: 600;
+  font-size: 14px;
+}
+[data-sonner-toaster] [data-sonner-toast] [data-description] {
+  color: #8A8478 !important;
+  font-size: 13px;
+}
+/* Success — lime left accent bar */
+[data-sonner-toaster] [data-sonner-toast][data-type="success"] {
+  border-left: 4px solid #C5F82A !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="success"] [data-icon] svg {
+  color: #C5F82A;
+}
+/* Error — red left accent bar */
+[data-sonner-toaster] [data-sonner-toast][data-type="error"] {
+  border-left: 4px solid #E5484D !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="error"] [data-icon] svg {
+  color: #E5484D;
+}
+/* Warning — amber accent */
+[data-sonner-toaster] [data-sonner-toast][data-type="warning"] {
+  border-left: 4px solid #F5A524 !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="warning"] [data-icon] svg {
+  color: #F5A524;
+}

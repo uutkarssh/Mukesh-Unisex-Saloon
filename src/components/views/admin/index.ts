@@ -1,0 +1,7 @@
+export { DashboardView } from './DashboardView'
+export { AppointmentsView } from './AppointmentsView'
+export { ServicesAdminView } from './ServicesAdminView'
+export { StylistsView } from './StylistsView'
+export { GalleryAdminView } from './GalleryAdminView'
+export { OffersAdminView } from './OffersAdminView'
+export { SettingsView } from './SettingsView'
