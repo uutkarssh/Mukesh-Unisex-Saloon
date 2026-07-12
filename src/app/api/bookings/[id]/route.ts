@@ -1,9 +1,10 @@
-// PATCH /api/bookings/[id] — update status/notes (any admin role; barbers can mark done/no-show/cancel)
-// DELETE /api/bookings/[id] — cancel a booking (any admin role)
+// PATCH  /api/bookings/[id] — update status/notes (any admin role)
+// DELETE /api/bookings/[id] — PERMANENTLY delete the booking from the database (developer only)
 
 import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 import { updateBooking } from '@/lib/queries'
-import { requireAuth } from '@/lib/session'
+import { requireAuth, requireRole } from '@/lib/session'
 
 const VALID_STATUSES = ['confirmed', 'done', 'no-show', 'cancelled']
 
@@ -33,16 +34,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 }
 
+// PERMANENTLY delete a booking row from the database.
+// Developer only — barbers can't delete (they can only mark done/no-show/cancel).
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await requireAuth()
-    if (!session) return NextResponse.json({ error: 'Auth required.' }, { status: 401 })
+    const session = await requireRole('developer')
+    if (!session) return NextResponse.json({ error: 'Developer access required.' }, { status: 403 })
 
     const { id } = await params
-    await updateBooking(id, { status: 'cancelled' })
+    await db.execute({ sql: 'DELETE FROM Booking WHERE id = ?', args: [id] })
     return NextResponse.json({ ok: true })
   } catch (err) {
-    console.error('cancel booking error', err)
-    return NextResponse.json({ error: 'Failed to cancel booking.' }, { status: 500 })
+    console.error('delete booking error', err)
+    return NextResponse.json({ error: 'Failed to delete booking.' }, { status: 500 })
   }
-}
+  }
