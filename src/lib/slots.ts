@@ -1,19 +1,9 @@
 // Slot generation — the core booking logic.
 //
-// Algorithm (unchanged from reference implementation):
-//   1. For a given stylist + date + service duration, generate candidate start times
-//      every SLOT_STEP_MIN minutes from open hour to (close hour - service duration).
-//   2. For each candidate, compute the padded interval:
-//        [start - buffer, start + duration + buffer]
-//      This makes gaps scale with service length rather than being fixed.
-//   3. A candidate is available iff its padded interval does not overlap the padded
-//      interval of any existing booking or time block for that stylist on that date,
-//      AND the candidate is in the future (can't book in the past).
-//   4. Skip the closed day entirely.
-//
-// This is per-stylist (not per-salon), supporting multiple simultaneous stylists.
-//
-// NOTE: data access goes through the parameterized SQL layer in lib/queries.ts.
+// TIMEZONE NOTE: The salon operates in IST (Asia/Kolkata, UTC+5:30).
+// Vercel runs in UTC, so we must NOT use Date.setHours()/getHours()
+// (those use the server's timezone). Instead we compute the exact UTC
+// instant for a given IST hour on a given calendar date.
 
 import {
   getAllSettings,
@@ -31,8 +21,8 @@ import {
 } from './constants'
 
 export type Slot = {
-  startTime: string // ISO
-  endTime: string // ISO
+  startTime: string // ISO (UTC)
+  endTime: string // ISO (UTC)
   available: boolean
 }
 
@@ -40,6 +30,27 @@ export type SlotGenerationInput = {
   stylistId: string
   serviceDurationMin: number
   date: Date // the day to generate slots for (any time during the day)
+}
+
+// IST is UTC+5:30 (fixed offset, India has no DST).
+const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000
+
+// Given a calendar date and an IST hour (e.g. 8 = 8:00 AM IST, 20 = 8:00 PM IST),
+// return the exact UTC Date instant.
+function istInstant(date: Date, hour: number, minute = 0): Date {
+  const y = date.getFullYear()
+  const m = date.getMonth()
+  const d = date.getDate()
+  // Date.UTC(...) gives the instant for "hour:minute UTC on Y/M/D".
+  // Subtract the IST offset so the result is the UTC instant for "hour:minute IST".
+  return new Date(Date.UTC(y, m, d, hour, minute, 0, 0) - IST_OFFSET_MS)
+}
+
+// Given a UTC Date instant, return the IST hour as a decimal
+// (e.g. 14.5 = 2:30 PM IST). Used for the open/close hour check.
+function istHourDecimal(date: Date): number {
+  const istDate = new Date(date.getTime() + IST_OFFSET_MS)
+  return istDate.getUTCHours() + istDate.getUTCMinutes() / 60
 }
 
 export async function generateSlots({
@@ -57,14 +68,12 @@ export async function generateSlots({
 
   const { openHour, closeHour } = getOpenCloseHours(date, cfg)
 
-  // Define the day's window (we store times as UTC ISO strings)
-  const dayStart = new Date(date)
-  dayStart.setHours(openHour, 0, 0, 0)
-  const dayEnd = new Date(date)
-  dayEnd.setHours(closeHour, 0, 0, 0)
+  // Define the day's window in IST (converted to exact UTC instants).
+  // e.g. openHour=8, closeHour=20 → 8:00 AM IST to 8:00 PM IST.
+  const dayStart = istInstant(date, openHour)
+  const dayEnd = istInstant(date, closeHour)
 
   // Fetch existing bookings + time blocks for this stylist on this day.
-  // Widen the window by one buffer on each side so edge-of-day overlaps are caught.
   const bufferMs = cfg.bufferMin * 60 * 1000
   const windowStart = new Date(dayStart.getTime() - bufferMs)
   const windowEnd = new Date(dayEnd.getTime() + bufferMs)
@@ -125,10 +134,11 @@ export async function isSlotAvailable(
   if (isClosedDay(startTime, cfg.closedDay)) return false
 
   const { openHour, closeHour } = getOpenCloseHours(startTime, cfg)
-  const startHour = startTime.getHours() + startTime.getMinutes() / 60
+  // Use IST hours (not server-local getHours).
+  const startHour = istHourDecimal(startTime)
   if (startHour < openHour) return false
   const endTime = new Date(startTime.getTime() + serviceDurationMin * 60 * 1000)
-  const endHour = endTime.getHours() + endTime.getMinutes() / 60
+  const endHour = istHourDecimal(endTime)
   if (endHour > closeHour) return false
 
   if (startTime.getTime() <= Date.now()) return false
