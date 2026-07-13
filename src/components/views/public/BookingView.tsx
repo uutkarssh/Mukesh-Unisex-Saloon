@@ -166,7 +166,7 @@ export function BookingView() {
             <CheckCircle2 className="w-9 h-9 text-[#1A1A1A]" />
           </div>
           <h2 className="font-display text-3xl font-bold mb-2">You're all set!</h2>
-          <p className="text-[#8A8478] mb-8">A confirmation has been sent to your phone via WhatsApp.</p>
+          <p className="text-[#8A8478] mb-8">Your Appointment Has Been Booked Kindly Take A Screenshot of This Page.</p>
           <div className="text-left max-w-sm mx-auto p-5 rounded-xl bg-[#F4F1EA] border border-[#E5E1D7] space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-[#8A8478]">Booking ID</span><span className="font-mono text-xs">{confirmed.id.slice(-8).toUpperCase()}</span></div>
             <div className="flex justify-between"><span className="text-[#8A8478]">Service</span><span className="font-medium">{confirmed.serviceName}</span></div>
@@ -365,7 +365,7 @@ export function BookingView() {
                     maxLength={10}
                   />
                 </div>
-                <p className="text-xs text-[#8A8478] mt-1">Enter your 10-digit mobile number. We'll send a WhatsApp confirmation.</p>
+                <p className="text-xs text-[#8A8478] mt-1">Enter your 10-digit mobile number. We'll call you for confirmation.</p>
               </div>
               <div>
                 <Label htmlFor="bk-notes">Notes (optional)</Label>
